@@ -5,28 +5,16 @@ console.log("EMAIL_USER:", process.env.EMAIL_USER);
 console.log("EMAIL_PASS exists:", !!process.env.EMAIL_PASS);
 
 const transporter = nodemailer.createTransport({
-  host: "smtp.gmail.com",
-  port: 587,
-  secure: false, // false for port 587
-  requireTLS: true,
+  service: "gmail",
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASS,
   },
 });
 
-// Verify SMTP connection
-transporter.verify((error, success) => {
-  if (error) {
-    console.error("SMTP Connection Error:", error);
-  } else {
-    console.log("SMTP Server is ready to send emails");
-  }
-});
-
 const sendMail = async (to, subject, heading, otp) => {
   try {
-    await transporter.sendMail({
+    const info = await transporter.sendMail({
       from: `"QuickCart" <${process.env.EMAIL_USER}>`,
       to,
       subject,
@@ -36,34 +24,31 @@ const sendMail = async (to, subject, heading, otp) => {
           <p>Your OTP is:</p>
           <h1 style="letter-spacing:4px;">${otp}</h1>
           <p>This OTP is valid for <strong>10 minutes</strong>.</p>
-          <p>If you did not request this OTP, you can safely ignore this email.</p>
+          <p>If you did not request this OTP, please ignore this email.</p>
         </div>
       `,
     });
 
-    console.log(`Email sent successfully to ${to}`);
+    console.log("Email sent:", info.messageId);
   } catch (error) {
-    console.error("Email sending failed:", error);
+    console.error("Email Error:", error);
     throw error;
   }
 };
 
-const sendOtp = async (email, otp) => {
-  await sendMail(email, "Password Reset OTP", "Password Reset", otp);
-};
+const sendOtp = (email, otp) =>
+  sendMail(email, "Password Reset OTP", "Password Reset", otp);
 
-const sendOtpForLogin = async (email, otp) => {
-  await sendMail(email, "Login OTP", "Login Verification", otp);
-};
+const sendOtpForLogin = (email, otp) =>
+  sendMail(email, "Login OTP", "Login Verification", otp);
 
-const sendOtpForCreateUser = async (email, otp) => {
-  await sendMail(
+const sendOtpForCreateUser = (email, otp) =>
+  sendMail(
     email,
     "New User Registration OTP",
     "Registration Verification",
     otp,
   );
-};
 
 module.exports = {
   sendOtp,
