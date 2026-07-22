@@ -2,55 +2,68 @@ const nodemailer = require("nodemailer");
 require("dotenv").config();
 
 const transporter = nodemailer.createTransport({
-  service: "gmail",
+  host: "smtp.gmail.com",
+  port: 587,
+  secure: false, // false for port 587
+  requireTLS: true,
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASS,
   },
 });
 
+// Verify SMTP connection
+transporter.verify((error, success) => {
+  if (error) {
+    console.error("SMTP Connection Error:", error);
+  } else {
+    console.log("SMTP Server is ready to send emails");
+  }
+});
+
+const sendMail = async (to, subject, heading, otp) => {
+  try {
+    await transporter.sendMail({
+      from: `"QuickCart" <${process.env.EMAIL_USER}>`,
+      to,
+      subject,
+      html: `
+        <div style="font-family: Arial, sans-serif; padding:20px;">
+          <h2>${heading}</h2>
+          <p>Your OTP is:</p>
+          <h1 style="letter-spacing:4px;">${otp}</h1>
+          <p>This OTP is valid for <strong>10 minutes</strong>.</p>
+          <p>If you did not request this OTP, you can safely ignore this email.</p>
+        </div>
+      `,
+    });
+
+    console.log(`Email sent successfully to ${to}`);
+  } catch (error) {
+    console.error("Email sending failed:", error);
+    throw error;
+  }
+};
+
 const sendOtp = async (email, otp) => {
-  await transporter.sendMail({
-    from: process.env.EMAIL_USER,
-    to: email,
-    subject: "Password Reset OTP",
-    html: `
-      <h2>Password Reset</h2>
-      <p>Your OTP is:</p>
-      <h1>${otp}</h1>
-      <p>Valid for 10 minutes.</p>
-      <p>If you did not request this, please ignore this email.</p>
-    `,
-  });
+  await sendMail(email, "Password Reset OTP", "Password Reset", otp);
 };
 
 const sendOtpForLogin = async (email, otp) => {
-  await transporter.sendMail({
-    from: process.env.EMAIL_USER,
-    to: email,
-    subject: "Login OTP",
-    html: `
-      <h2>Login OTP</h2>
-      <p>Your OTP is:</p>
-      <h1>${otp}</h1>
-      <p>Valid for 10 minutes.</p>
-      <p>If you did not request this, please ignore this email.</p>
-    `,
-  });
-};
-const sendOtpForCreateUser = async (email, otp) => {
-  await transporter.sendMail({
-    from: process.env.EMAIL_USER,
-    to: email,
-    subject: "New User Registration OTP",
-    html: `
-      <h2>Registration OTP</h2>
-      <p>Your OTP is:</p>
-      <h1>${otp}</h1>
-      <p>Valid for 10 minutes.</p>
-      <p>If you did not request this, please ignore this email.</p>
-    `,
-  });
+  await sendMail(email, "Login OTP", "Login Verification", otp);
 };
 
-module.exports = { sendOtp, sendOtpForLogin, sendOtpForCreateUser };
+const sendOtpForCreateUser = async (email, otp) => {
+  await sendMail(
+    email,
+    "New User Registration OTP",
+    "Registration Verification",
+    otp,
+  );
+};
+
+module.exports = {
+  sendOtp,
+  sendOtpForLogin,
+  sendOtpForCreateUser,
+};
