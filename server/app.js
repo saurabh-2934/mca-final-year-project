@@ -15,7 +15,7 @@ app.use(express.json());
 
 const allowedOrigins = [
   "http://localhost:3000",
-  "https://mca-final-year-project.onrender.com",
+  "celadon-rabanadas-24cfb0.netlify.app",
 ];
 
 app.use(
