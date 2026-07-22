@@ -1,13 +1,17 @@
 const nodemailer = require("nodemailer");
 require("dotenv").config();
 
-console.log("EMAIL_USER:", process.env.EMAIL_USER);
-console.log("EMAIL_PASS exists:", !!process.env.EMAIL_PASS);
+if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
+  throw new Error(
+    "EMAIL_USER or EMAIL_PASS is missing. Check your environment variables.",
+  );
+}
 
 const transporter = nodemailer.createTransport({
   host: "smtp.gmail.com",
   port: 587,
-  secure: false,
+  secure: false, // TLS on port 587
+  requireTLS: true,
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASS,
@@ -19,6 +23,9 @@ const transporter = nodemailer.createTransport({
 
 const sendMail = async (to, subject, heading, otp) => {
   try {
+    console.log("Sending email to:", to);
+    console.log("EMAIL_USER:", process.env.EMAIL_USER);
+
     const info = await transporter.sendMail({
       from: `"QuickCart" <${process.env.EMAIL_USER}>`,
       to,
@@ -34,26 +41,30 @@ const sendMail = async (to, subject, heading, otp) => {
       `,
     });
 
-    console.log("Email sent:", info.messageId);
+    console.log("Email sent successfully:", info.messageId);
+    return info;
   } catch (error) {
     console.error("Email Error:", error);
     throw error;
   }
 };
 
-const sendOtp = (email, otp) =>
-  sendMail(email, "Password Reset OTP", "Password Reset", otp);
+const sendOtp = async (email, otp) => {
+  return sendMail(email, "Password Reset OTP", "Password Reset", otp);
+};
 
-const sendOtpForLogin = (email, otp) =>
-  sendMail(email, "Login OTP", "Login Verification", otp);
+const sendOtpForLogin = async (email, otp) => {
+  return sendMail(email, "Login OTP", "Login Verification", otp);
+};
 
-const sendOtpForCreateUser = (email, otp) =>
-  sendMail(
+const sendOtpForCreateUser = async (email, otp) => {
+  return sendMail(
     email,
     "New User Registration OTP",
     "Registration Verification",
     otp,
   );
+};
 
 module.exports = {
   sendOtp,
