@@ -11,26 +11,33 @@ const addressRoute = require("./routes/address.route");
 const cartRoute = require("./routes/cart.route");
 const orderRoute = require("./routes/order.route");
 
+app.use(express.json());
+
 const allowedOrigins = [
   "http://localhost:3000",
   "https://mca-final-year-project.onrender.com",
 ];
 
-app.use(express.json());
-
 app.use(
   cors({
-    origin: (origin, callback) => {
-      // Allow requests without origin (Postman, mobile apps)
-      if (!origin) return callback(null, true);
+    origin: function (origin, callback) {
+      console.log("Origin:", origin);
+
+      // Allow requests from Postman or server-to-server requests
+      if (!origin) {
+        return callback(null, true);
+      }
 
       if (allowedOrigins.includes(origin)) {
         return callback(null, true);
       }
 
-      return callback(new Error("Not allowed by CORS"));
+      console.log("Blocked Origin:", origin);
+      return callback(null, false);
     },
     credentials: true,
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
   }),
 );
 
