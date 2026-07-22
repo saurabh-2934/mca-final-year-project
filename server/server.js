@@ -6,9 +6,10 @@ const connectDb = require("./config/db");
 
 connectDb();
 
-const port = process.env.PORT;
+const port = process.env.PORT || 5000;
+
 const server = http.createServer(app);
 
 server.listen(port, () => {
-  console.log(`server is listning on http://localhost:${port}`);
+  console.log(`Server is running on port ${port}`);
 });
