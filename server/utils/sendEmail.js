@@ -10,15 +10,16 @@ if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
 const transporter = nodemailer.createTransport({
   host: "smtp.gmail.com",
   port: 587,
-  secure: false, // TLS on port 587
+  secure: false,
   requireTLS: true,
+  family: 4, // Force IPv4
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASS,
   },
-  connectionTimeout: 30000,
-  greetingTimeout: 30000,
-  socketTimeout: 30000,
+  connectionTimeout: 60000,
+  greetingTimeout: 60000,
+  socketTimeout: 60000,
 });
 
 const sendMail = async (to, subject, heading, otp) => {
