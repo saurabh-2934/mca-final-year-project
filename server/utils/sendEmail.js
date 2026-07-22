@@ -10,55 +10,50 @@ apiInstance.setApiKey(
 
 const sendMail = async (to, subject, heading, otp) => {
   try {
-    console.log("==================================");
-    console.log("Sending Email...");
-    console.log("To:", to);
-    console.log("==================================");
-
-    const email = new brevo.SendSmtpEmail();
-
-    email.sender = {
-      name: "QuickCart",
-      email: process.env.EMAIL_USER,
-    };
-
-    email.to = [
-      {
-        email: to,
+    const email = {
+      sender: {
+        name: "QuickCart",
+        email: process.env.EMAIL_USER,
       },
-    ];
 
-    email.subject = subject;
+      to: [
+        {
+          email: to,
+        },
+      ],
 
-    email.htmlContent = `
-      <div style="font-family:Arial,sans-serif;padding:20px">
-        <h2>${heading}</h2>
+      subject,
 
-        <p>Your OTP is</p>
+      htmlContent: `
+        <div style="font-family:Arial,sans-serif;padding:20px">
+          <h2>${heading}</h2>
 
-        <h1 style="letter-spacing:6px;color:#2563eb">
-          ${otp}
-        </h1>
+          <p>Your OTP is:</p>
 
-        <p>This OTP is valid for <strong>10 minutes</strong>.</p>
+          <h1 style="color:#2563eb;letter-spacing:5px">
+            ${otp}
+          </h1>
 
-        <p>If you didn't request this OTP, please ignore this email.</p>
+          <p>This OTP is valid for <b>10 minutes</b>.</p>
 
-        <br>
+          <p>If you didn't request this OTP, please ignore this email.</p>
 
-        <p>Thanks,</p>
-        <h3>QuickCart Team</h3>
-      </div>
-    `;
+          <br/>
+
+          <p>Thanks,</p>
+          <h3>QuickCart Team</h3>
+        </div>
+      `,
+    };
 
     const response = await apiInstance.sendTransacEmail(email);
 
-    console.log("Email Sent Successfully");
-    console.log(response);
+    console.log("✅ Email Sent");
+    console.log(response.body);
 
-    return response;
+    return response.body;
   } catch (err) {
-    console.error("Brevo Error");
+    console.error("❌ Brevo Error");
 
     if (err.response) {
       console.error(err.response.body);
@@ -70,22 +65,14 @@ const sendMail = async (to, subject, heading, otp) => {
   }
 };
 
-const sendOtp = async (email, otp) => {
-  return await sendMail(email, "Password Reset OTP", "Password Reset", otp);
-};
+const sendOtp = (email, otp) =>
+  sendMail(email, "Password Reset OTP", "Password Reset", otp);
 
-const sendOtpForLogin = async (email, otp) => {
-  return await sendMail(email, "Login OTP", "Login Verification", otp);
-};
+const sendOtpForLogin = (email, otp) =>
+  sendMail(email, "Login OTP", "Login Verification", otp);
 
-const sendOtpForCreateUser = async (email, otp) => {
-  return await sendMail(
-    email,
-    "Registration OTP",
-    "Registration Verification",
-    otp,
-  );
-};
+const sendOtpForCreateUser = (email, otp) =>
+  sendMail(email, "Registration OTP", "Registration Verification", otp);
 
 module.exports = {
   sendOtp,
