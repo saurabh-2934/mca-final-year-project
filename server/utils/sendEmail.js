@@ -1,64 +1,64 @@
-const brevo = require("@getbrevo/brevo");
+const axios = require("axios");
 require("dotenv").config();
-
-const apiInstance = new brevo.TransactionalEmailsApi();
-
-apiInstance.setApiKey(
-  brevo.TransactionalEmailsApiApiKeys.apiKey,
-  process.env.BREVO_API_KEY,
-);
 
 const sendMail = async (to, subject, heading, otp) => {
   try {
-    const email = {
-      sender: {
-        name: "QuickCart",
-        email: process.env.EMAIL_USER,
-      },
-
-      to: [
-        {
-          email: to,
+    const response = await axios.post(
+      "https://api.brevo.com/v3/smtp/email",
+      {
+        sender: {
+          name: "QuickCart",
+          email: process.env.EMAIL_USER,
         },
-      ],
 
-      subject,
+        to: [
+          {
+            email: to,
+          },
+        ],
 
-      htmlContent: `
-        <div style="font-family:Arial,sans-serif;padding:20px">
-          <h2>${heading}</h2>
+        subject,
 
-          <p>Your OTP is:</p>
+        htmlContent: `
+          <div style="font-family:Arial,sans-serif;padding:20px">
+            <h2>${heading}</h2>
 
-          <h1 style="color:#2563eb;letter-spacing:5px">
-            ${otp}
-          </h1>
+            <p>Your OTP is:</p>
 
-          <p>This OTP is valid for <b>10 minutes</b>.</p>
+            <h1 style="color:#2563eb;letter-spacing:5px">
+              ${otp}
+            </h1>
 
-          <p>If you didn't request this OTP, please ignore this email.</p>
+            <p>This OTP is valid for <strong>10 minutes</strong>.</p>
 
-          <br/>
+            <p>If you didn't request this OTP, ignore this email.</p>
 
-          <p>Thanks,</p>
-          <h3>QuickCart Team</h3>
-        </div>
-      `,
-    };
+            <br>
 
-    const response = await apiInstance.sendTransacEmail(email);
+            <p>QuickCart Team</p>
+          </div>
+        `,
+      },
+      {
+        headers: {
+          accept: "application/json",
+          "api-key": process.env.BREVO_API_KEY,
+          "content-type": "application/json",
+        },
+      },
+    );
 
     console.log("✅ Email Sent");
-    console.log(response.body);
+    console.log(response.data);
 
-    return response.body;
+    return response.data;
   } catch (err) {
     console.error("❌ Brevo Error");
 
     if (err.response) {
-      console.error(err.response.body);
+      console.log(err.response.data);
     } else {
-      console.error(err);
+      console.log(err.message);
     }
 
     throw err;
