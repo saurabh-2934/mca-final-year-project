@@ -1,101 +1,90 @@
-const dns = require("dns");
-dns.setDefaultResultOrder("ipv4first");
-
-const nodemailer = require("nodemailer");
+const brevo = require("@getbrevo/brevo");
 require("dotenv").config();
 
-// Check Brevo credentials
-if (!process.env.BREVO_USER || !process.env.BREVO_PASS) {
-  throw new Error(
-    "BREVO_USER or BREVO_PASS is missing in environment variables.",
-  );
-}
+const apiInstance = new brevo.TransactionalEmailsApi();
 
-// Create SMTP transporter
-const transporter = nodemailer.createTransport({
-  host: "smtp-relay.brevo.com",
-  port: 587,
-  secure: false,
-  auth: {
-    user: process.env.BREVO_USER,
-    pass: process.env.BREVO_PASS,
-  },
-});
+apiInstance.setApiKey(
+  brevo.TransactionalEmailsApiApiKeys.apiKey,
+  process.env.BREVO_API_KEY,
+);
 
-// Common function to send mail
 const sendMail = async (to, subject, heading, otp) => {
   try {
-    console.log("======================================");
+    console.log("==================================");
     console.log("Sending Email...");
     console.log("To:", to);
-    console.log("SMTP Login:", process.env.BREVO_USER);
-    console.log("======================================");
+    console.log("==================================");
 
-    const info = await transporter.sendMail({
-      from: '"QuickCart" <quickcart.ecommerce.off@gmail.com>',
-      to,
-      subject,
-      html: `
-        <div style="max-width:600px;margin:auto;padding:20px;font-family:Arial,sans-serif;border:1px solid #ddd;border-radius:10px;">
-          <h2 style="color:#2563eb;">${heading}</h2>
+    const email = new brevo.SendSmtpEmail();
 
-          <p>Hello,</p>
+    email.sender = {
+      name: "QuickCart",
+      email: process.env.EMAIL_USER,
+    };
 
-          <p>Your One-Time Password (OTP) is:</p>
+    email.to = [
+      {
+        email: to,
+      },
+    ];
 
-          <h1 style="
-              background:#2563eb;
-              color:#fff;
-              display:inline-block;
-              padding:12px 24px;
-              border-radius:8px;
-              letter-spacing:6px;
-          ">
-            ${otp}
-          </h1>
+    email.subject = subject;
 
-          <p style="margin-top:20px;">
-            This OTP is valid for <strong>10 minutes</strong>.
-          </p>
+    email.htmlContent = `
+      <div style="font-family:Arial,sans-serif;padding:20px">
+        <h2>${heading}</h2>
 
-          <p>
-            If you did not request this OTP, please ignore this email.
-          </p>
+        <p>Your OTP is</p>
 
-          <hr>
+        <h1 style="letter-spacing:6px;color:#2563eb">
+          ${otp}
+        </h1>
 
-          <p style="color:#777;font-size:13px;">
-            Thanks,<br>
-            <strong>QuickCart Team</strong>
-          </p>
-        </div>
-      `,
-    });
+        <p>This OTP is valid for <strong>10 minutes</strong>.</p>
 
-    console.log("✅ Email Sent Successfully");
-    console.log("Message ID:", info.messageId);
+        <p>If you didn't request this OTP, please ignore this email.</p>
 
-    return info;
-  } catch (error) {
-    console.error("❌ Email Sending Failed");
-    console.error(error);
-    throw error;
+        <br>
+
+        <p>Thanks,</p>
+        <h3>QuickCart Team</h3>
+      </div>
+    `;
+
+    const response = await apiInstance.sendTransacEmail(email);
+
+    console.log("Email Sent Successfully");
+    console.log(response);
+
+    return response;
+  } catch (err) {
+    console.error("Brevo Error");
+
+    if (err.response) {
+      console.error(err.response.body);
+    } else {
+      console.error(err);
+    }
+
+    throw err;
   }
 };
 
-// Password Reset OTP
 const sendOtp = async (email, otp) => {
-  return sendMail(email, "Password Reset OTP", "Password Reset", otp);
+  return await sendMail(email, "Password Reset OTP", "Password Reset", otp);
 };
 
-// Login OTP
 const sendOtpForLogin = async (email, otp) => {
-  return sendMail(email, "Login OTP", "Login Verification", otp);
+  return await sendMail(email, "Login OTP", "Login Verification", otp);
 };
 
-// Registration OTP
 const sendOtpForCreateUser = async (email, otp) => {
-  return sendMail(email, "Registration OTP", "Registration Verification", otp);
+  return await sendMail(
+    email,
+    "Registration OTP",
+    "Registration Verification",
+    otp,
+  );
 };
 
 module.exports = {

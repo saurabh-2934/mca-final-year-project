@@ -9,3 +9,4 @@ npm install express-validator
 npm install razorpay
 npm install cookie-parser
 npm install crypto
+npm install @getbrevo/brevo
