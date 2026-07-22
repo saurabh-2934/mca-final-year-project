@@ -1,7 +1,7 @@
 const express = require("express");
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
-require("dotenv").config;
+require("dotenv").config();
 
 const app = express();
 
@@ -14,26 +14,32 @@ const orderRoute = require("./routes/order.route");
 
 app.use(express.json());
 
-const allowedOrigins = [process.env.CLIENT_URL, "http://localhost:3000"];
+const allowedOrigins = [process.env.CLIENT_URL, "http://localhost:3000"].filter(
+  Boolean,
+);
+
+console.log("Allowed Origins:", allowedOrigins);
 
 app.use(
   cors({
     origin: (origin, callback) => {
-      console.log("Origin received:", JSON.stringify(origin));
-      console.log("Allowed:", [...allowedOrigins]);
+      console.log("Origin:", origin);
 
+      // Allow requests with no origin (Postman, mobile apps)
       if (!origin) {
         return callback(null, true);
       }
 
-      if (allowedOrigins.has(origin.trim())) {
+      if (allowedOrigins.includes(origin.trim())) {
         return callback(null, true);
       }
 
       console.log("Blocked Origin:", origin);
-      return callback(new Error("Not allowed by CORS"));
+      callback(new Error("Not allowed by CORS"));
     },
     credentials: true,
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
   }),
 );
 
