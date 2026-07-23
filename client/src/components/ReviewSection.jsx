@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import axiosInstance from "../utils/axiosInstance";
 import toast from "react-hot-toast";
 
@@ -12,7 +12,7 @@ function ReviewSection({ productId }) {
   const [totalReviews, setTotalReviews] = useState(0);
   const [loading, setLoading] = useState(false);
 
-  const getReviews = async () => {
+  const getReviews = useCallback(async () => {
     try {
       setLoading(true);
 
@@ -26,13 +26,13 @@ function ReviewSection({ productId }) {
     } finally {
       setLoading(false);
     }
-  };
+  }, [productId]);
 
   useEffect(() => {
     if (productId) {
       getReviews();
     }
-  }, [productId]);
+  }, [productId, getReviews]);
 
   return (
     <div className="mt-10 bg-white rounded-lg shadow p-6">

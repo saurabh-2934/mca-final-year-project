@@ -8,7 +8,8 @@ const createReview = async (req, res) => {
   try {
     const { product, rating, comment } = req.body;
     const user = req.user.id;
-
+    console.log("hi back");
+    console.log(product, rating, comment, user);
     if (!product || !rating) {
       return res.status(400).json({
         success: false,
@@ -84,7 +85,8 @@ const createReview = async (req, res) => {
       review,
     });
   } catch (error) {
-    return res.status(500).json({
+    console.log(error.message);
+    res.status(500).json({
       success: false,
       message: error.message,
     });

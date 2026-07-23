@@ -16,7 +16,7 @@ function AddReview({ productId, refreshReviews }) {
 
     try {
       setLoading(true);
-
+      console.log(productId);
       await axiosInstance.post("/review/create", {
         product: productId,
         rating,
@@ -31,6 +31,7 @@ function AddReview({ productId, refreshReviews }) {
 
       refreshReviews();
     } catch (err) {
+      console.log(err.response?.data?.message);
       toast.error(err.response?.data?.message || "Something went wrong.");
     } finally {
       setLoading(false);

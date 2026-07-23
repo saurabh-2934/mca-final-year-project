@@ -24,8 +24,6 @@ console.log("Allowed Origins:", allowedOrigins);
 app.use(
   cors({
     origin: (origin, callback) => {
-      console.log("Origin:", origin);
-
       // Allow requests with no origin (Postman, mobile apps)
       if (!origin) {
         return callback(null, true);
@@ -52,5 +50,6 @@ app.use("/", productRoute);
 app.use("/address", addressRoute);
 app.use("/cart", cartRoute);
 app.use("/order", orderRoute);
+app.use("/review", reviewRoute);
 
 module.exports = app;
