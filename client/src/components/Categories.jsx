@@ -17,7 +17,7 @@ function Categories({ selectedCat }) {
     const fetchCategories = async () => {
       try {
         const response = await axiosInstance.get("/category");
-        const data = await response.json();
+        const data = response.data;
 
         const newData = data.map((category) => ({
           id: category._id,
