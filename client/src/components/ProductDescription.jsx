@@ -14,7 +14,7 @@ import CardOfferSection from "./CardOfferSection";
 import formatDateWithDay from "../utils/getDate";
 import SelectAddress from "./SelectAddress";
 import axiosInstance from "../utils/axiosInstance";
-
+import ReviewSection from "./ReviewSection";
 const today = new Date();
 
 const fiveDaysLater = new Date(today);
@@ -173,23 +173,7 @@ function ProductDescription({ product }) {
         <h2 className="text-zinc-700 text-2xl font-bold text-left mb-4">
           Ratings and reviews
         </h2>
-        {product.reviews.length === 0 ? (
-          <p className="text-zinc-500 text-base font-semibold mb-2">
-            No reviews yet!
-          </p>
-        ) : (
-          ""
-        )}
-        <div className="w-full flex mb-6">
-          <input
-            type="text"
-            placeholder="Add your commnets"
-            className="outline-none border-b-[1px] border-zinc-700 w-full mr-2"
-          />
-          <button className="bg-yellow-300 text-base font-bold text-zinc-700 px-4 py-2 rounded-md hover:bg-yellow-400">
-            Add
-          </button>
-        </div>
+        <ReviewSection productId={product.id} />
         <div className="flex w-full items-center sticky">
           {isInCart ? (
             <Link to="/Carts">

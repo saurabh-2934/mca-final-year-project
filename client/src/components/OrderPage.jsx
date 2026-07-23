@@ -243,26 +243,32 @@ function OrderPage() {
                           Delivery Address
                         </h3>
 
-                        <p className="text-sm text-gray-600">
-                          <span className="font-semibold">
-                            {order.shippingAddress.fullName}
-                          </span>
-                        </p>
+                        {order.shippingAddress ? (
+                          <>
+                            <p className="text-sm text-gray-600">
+                              <span className="font-semibold">
+                                {order.shippingAddress.fullName}
+                              </span>
+                            </p>
 
-                        <p className="text-sm text-gray-600">
-                          {order.shippingAddress.area},{" "}
-                          {order.shippingAddress.locality}
-                        </p>
+                            <p className="text-sm text-gray-600">
+                              {order.shippingAddress.area},{" "}
+                              {order.shippingAddress.locality}
+                            </p>
 
-                        <p className="text-sm text-gray-600">
-                          {order.shippingAddress.city},{" "}
-                          {order.shippingAddress.state} -{" "}
-                          {order.shippingAddress.pincode}
-                        </p>
+                            <p className="text-sm text-gray-600">
+                              {order.shippingAddress.city},{" "}
+                              {order.shippingAddress.state} -{" "}
+                              {order.shippingAddress.pincode}
+                            </p>
 
-                        <p className="text-sm text-gray-600 mt-1">
-                          Phone : {order.shippingAddress.phone}
-                        </p>
+                            <p className="text-sm text-gray-600 mt-1">
+                              Phone : {order.shippingAddress.phone}
+                            </p>
+                          </>
+                        ) : (
+                          <p className="text-red-500">Address not available</p>
+                        )}
                       </div>
                     </div>
                   </div>

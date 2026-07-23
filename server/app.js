@@ -11,6 +11,7 @@ const categoryRoute = require("./routes/category.route");
 const addressRoute = require("./routes/address.route");
 const cartRoute = require("./routes/cart.route");
 const orderRoute = require("./routes/order.route");
+const reviewRoute = require("./routes/review.route");
 
 app.use(express.json());
 
