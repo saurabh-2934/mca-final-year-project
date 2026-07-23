@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import CategoryTab from "./CategoryTab";
+import axiosInstance from "../utils/axiosInstance";
 
 function Categories({ selectedCat }) {
   const [categories, setCategories] = useState([]);
@@ -15,7 +16,7 @@ function Categories({ selectedCat }) {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await fetch("http://localhost:5000/category");
+        const response = await axiosInstance.get("/category");
         const data = await response.json();
 
         const newData = data.map((category) => ({
